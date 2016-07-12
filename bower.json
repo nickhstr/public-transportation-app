@@ -1,0 +1,16 @@
+{
+  "name": "transport-app",
+  "homepage": "https://github.com/nickhstr/public-transportation-app",
+  "authors": [
+    "Nick Hester <nickhstr@gmail.com>"
+  ],
+  "description": "Offline first tranportaion app.",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "polymer": "^1.6.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^1.2.1",
+    "google-map": "GoogleWebComponents/google-map#^1.1.10"
+  }
+}

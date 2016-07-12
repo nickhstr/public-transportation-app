@@ -1,0 +1,58 @@
+<!doctype html>
+
+<html>
+
+	<head>
+	  <title>Offline-First BART Trip Planner</title>
+	  <meta charset="utf-8">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+	  <script src="src/idb-promised.js"></script>
+	  <link rel="import" href="src/transport-app.html">
+	  <script>
+  		var dbPromise = idb.open('bart-db', 1, upgradeDB => {
+			  upgradeDB.createObjectStore('trips-data');
+			});
+
+			var keyValStore = {
+			  get: function(key) {
+			    return dbPromise.then(db => {
+			      return db.transaction('trips-data')
+			        .objectStore('trips-data').get(key);
+			    });
+			  },
+			  set: function(key, val) {
+			    return dbPromise.then(db => {
+			      var tx = db.transaction('trips-data', 'readwrite');
+			      tx.objectStore('trips-data').put(val, key);
+			      return tx.complete;
+			    });
+			  },
+			  delete: function(key) {
+			    return dbPromise.then(db => {
+			      var tx = db.transaction('trips-data', 'readwrite');
+			      tx.objectStore('trips-data').delete(key);
+			      return tx.complete;
+			    });
+			  }
+			};
+	  </script>
+	  <style>
+	    body {
+	      background-color: #fff;
+	      font-family: Helvetica, Arial, sans-serif;
+	      margin: 0;
+	    }
+	  </style>
+	</head>
+
+	<body unresolved>
+		<transport-app></transport-app>
+		<script>
+			// if ('serviceWorker' in navigator) {
+			//   navigator.serviceWorker.register('/service-worker.js');
+			// }
+		</script>
+	</body>
+
+</html>
