@@ -1,22 +1,47 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
+<link rel="import" href="transport-map.html">
 
 <dom-module id="transport-app">
 	<template>
 		<style>
+			:host {
+				display: flex;
+			}
+
 			.side {
 				width: 400px;
 				height: 100vh;
 				background-color: #4285f4;
 			}
-		</style>
 
+			transport-map {
+				width: calc(100% - 400px);
+			}
+
+			.alternate {
+				width: calc(100% - 400px);
+			}
+		</style>
+		
 		<div class="side"></div>
+		<transport-map
+			hidden$="[[!online]]"
+			start-address="South San Francisco"
+			end-address="Embarcadero"
+			latitude="37.779"
+			longitude="-122.3892"></transport-map>
+		<div class="alternate" hidden$="[[online]]">
+			<p>Some awesome stuff</p>
+		</div>
 	</template>
 	<script>
 		
 	Polymer({
 
 		is: 'transport-app',
+
+		behaviors: [Polymer.AppNetworkStatusBehavior],
 
 		properties: {
 
