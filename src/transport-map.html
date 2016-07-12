@@ -1,0 +1,34 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-map/google-map.html">
+<link rel="import" href="../bower_components/google-map/google-map-directions.html">
+
+<dom-module id="transport-map">
+	<template>
+		<style>
+			google-map {
+				height: 100%;
+			}
+		</style>
+	
+		<google-map-directions
+			map="{{map}}"
+			start-address="[[startAddress]]"
+			end-address="[[endAddress]]"
+			travel-mode="TRANSIT"></google-map-directions>
+		<google-map
+			map="{{map}}"
+			latitude="[[latitude]]"
+			longitude="[[longitude]]"
+			fit-to-markers
+			disable-default-ui></google-map>
+	</template>
+	<script>
+		
+	Polymer({
+
+		is: 'transport-map'
+
+	});
+
+	</script>
+</dom-module>
