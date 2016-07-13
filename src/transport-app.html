@@ -33,8 +33,8 @@
 		
 		<transport-map
 			hidden$="[[!online]]"
-			start-address="South San Francisco"
-			end-address="Embarcadero Station"
+			start-address="{{start}}"
+			end-address="{{end}}"
 			latitude="37.779"
 			longitude="-122.3892"></transport-map>
 		<div class="alternate" hidden$="[[online]]">
@@ -63,6 +63,14 @@
 				type: String,
 				notify: true
 			},
+			start: {
+				type: String,
+				notify: true
+			},
+			end: {
+				type: String,
+				notify: true
+			},
 			url: {
 				type: String,
 				notify: true,
@@ -76,16 +84,18 @@
 
 		listeners: {
 			'search': 'fetchTrip',
-			'stations': 'logStat'
+			'stations': 'updateStartEnd'
 		},
 
 		fetchTrip: function(e) {
 			this.$.bartRouteAjax.generateRequest();
 		},
 
-		logStat: function(e) {
-			this.orig = e.detail.start;
-			this.dest = e.detail.end;
+		updateStartEnd: function(e) {
+			this.orig = e.detail.startVal;
+			this.dest = e.detail.endVal;
+			this.start = e.detail.startName;
+			this.end = e.detail.endName;
 		},
 
 		_computeUrl: function(cmd, orig, dest) {
