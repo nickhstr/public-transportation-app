@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 
 <dom-module id="transport-datalist">
 	<template>
@@ -14,6 +15,12 @@
 			}
 		</style>
 
+		<iron-ajax
+			id="bartStations"
+			url="http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V"
+			handle-as="xml"
+			last-response="{{bartStationsResponse}}"></iron-ajax>
+
 		<paper-input
 			autofocus="[[autofocus]]"
 			list="stations"
@@ -22,7 +29,7 @@
 		</paper-input>
 		<datalist id="stations">
 			<template is="dom-repeat" items="[[stations]]">
-				<option value="[[item.name]]">[[item.name]]</option>
+				<option value="[[item.name]]"></option>
 			</template>
 		</datalist>
 	</template>
@@ -35,188 +42,7 @@
 		properties: {
 			stations: {
 				type: Array,
-				value: [
-					{
-						abbr: '12th',
-						name: '12th St. Oakland City Center'
-					},
-					{
-						abbr: '16th',
-						name: '16th St. Mission (SF)'
-					},
-					{
-						abbr: '19th',
-						name: '19th St. Oakland'
-					},
-					{
-						abbr: '24th',
-						name: '24th St. Mission (SF)'
-					},
-					{
-						abbr: 'ashb',
-						name: 'Ashby (Berkeley)'
-					},
-					{
-						abbr: 'balb',
-						name: 'Balboa Park (SF)'
-					},
-					{
-						abbr: 'bayf',
-						name: 'Bay Fair (San Leandro)'
-					},
-					{
-						abbr: 'cast',
-						name: 'Castro Valley'
-					},
-					{
-						abbr: 'civc',
-						name: 'Civic Center (SF)'
-					},
-					{
-						abbr: 'cols',
-						name: 'Coliseum'
-					},
-					{
-						abbr: 'colm',
-						name: 'Colma'
-					},
-					{
-						abbr: 'conc',
-						name: 'Concord'
-					},
-					{
-						abbr: 'daly',
-						name: 'Daly City'
-					},
-					{
-						abbr: 'dbrk',
-						name: 'Downtown Berkeley'
-					},
-					{
-						abbr: 'dubl',
-						name: 'Dublin/Pleasanton'
-					},
-					{
-						abbr: 'deln',
-						name: 'El Cerrito del Norte'
-					},
-					{
-						abbr: 'plza',
-						name: 'El Cerrito Plaza'
-					},
-					{
-						abbr: 'embr',
-						name: 'Embarcadero (SF)'
-					},
-					{
-						abbr: 'frmt',
-						name: 'Fremont'
-					},
-					{
-						abbr: 'ftvl',
-						name: 'Fruitvale (Oakland)'
-					},
-					{
-						abbr: 'glen',
-						name: 'Glen Park (SF)'
-					},
-					{
-						abbr: 'hayw',
-						name: 'Hayward'
-					},
-					{
-						abbr: 'lafy',
-						name: 'Lafayette'
-					},
-					{
-						abbr: 'lake',
-						name: 'Lake Merritt (Oakland)'
-					},
-					{
-						abbr: 'mcar',
-						name: 'MacArthur (Oakland)'
-					},
-					{
-						abbr: 'mlbr',
-						name: 'Millbrae'
-					},
-					{
-						abbr: 'mont',
-						name: 'Montgomery St. (SF)'
-					},
-					{
-						abbr: 'nbark',
-						name: 'North Berkeley'
-					},
-					{
-						abbr: 'ncon',
-						name: 'North Concord/Martinez'
-					},
-					{
-						abbr: 'oakl',
-						name: 'Oakland Int\'l Airport'
-					},
-					{
-						abbr: 'orin',
-						name: 'Orinda'
-					},
-					{
-						abbr: 'pitt',
-						name: 'Pittsburg/Bay Point'
-					},
-					{
-						abbr: 'phil',
-						name: 'Pleasant Hill'
-					},
-					{
-						abbr: 'powl',
-						name: 'Powell St. (SF)'
-					},
-					{
-						abbr: 'rich',
-						name: 'Richmond'
-					},
-					{
-						abbr: 'rock',
-						name: 'Rockridge (Oakland)'
-					},
-					{
-						abbr: 'sbrn',
-						name: 'San Bruno'
-					},
-					{
-						abbr: 'sfia',
-						name: 'San Francisco Int\'l Airport'
-					},
-					{
-						abbr: 'sanl',
-						name: 'San Leandro'
-					},
-					{
-						abbr: 'shay',
-						name: 'South Hayward'
-					},
-					{
-						abbr: 'ssan',
-						name: 'South San Francisco'
-					},
-					{
-						abbr: 'ucty',
-						name: 'Union City'
-					},
-					{
-						abbr: 'wcrk',
-						name: 'Walnut Creek'
-					},
-					{
-						abbr: 'wdub',
-						name: 'West Dublin'
-					},
-					{
-						abbr: 'woak',
-						name: 'West Oakland'
-					}
-				]
+				notify: true
 			},
 			stationName: {
 				type: String,
@@ -228,16 +54,45 @@
 			}
 		},
 
+		ready: function() {
+			var self = this;
+			return keyValStore.get('stations').then(function(data) {
+				if (data) {
+					self.stations = data;
+				}
+				else {
+					return self.$.bartStations.generateRequest();
+				}
+			});
+		},
+
 		observers: [
-			'_computeAbbr(stationName)'
+			'_computeAbbr(stationName)',
+			'_handleBartStations(bartStationsResponse)'
 		],
 
+		_handleBartStations: function(response) {
+			var self = this;
+			var list = [];
+			var stations = response.firstChild.childNodes[1].childNodes;
+
+			stations.forEach(function(station) {
+				list.push({
+					name: station.childNodes[0].textContent,
+					abbr: station.childNodes[1].textContent
+				});
+			});
+
+			return keyValStore.set('stations', list).then(self.ready);
+		},
+
 		_computeAbbr: function(stationName) {
-			var len = this.stations.length;
-			for (var i = 0; i < len; i++) {
-				if (this.stations[i].name === this.stationName) {
-					console.log('yay!');
-					this.stationAbbr = this.stations[i].abbr;
+			if (this.stations) {
+				var len = this.stations.length;
+				for (var i = 0; i < len; i++) {
+					if (this.stations[i].name === this.stationName) {
+						this.stationAbbr = this.stations[i].abbr;
+					}
 				}
 			}
 		}
