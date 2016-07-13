@@ -1,9 +1,24 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="transport-control-inputs.html">
+<link rel="import" href="transport-control-results.html">
 
 <dom-module id="transport-control-panel">
 	<template>
-		<style></style>
+		<style is="custom-style">
+			:host {
+				z-index: 1;
+				width: var(--panel-width);
+				height: 100vh;
+				box-shadow: 3px 0 4px 2px rgba(0, 0, 0, 0.14),
+	                  1px 0 8px 2px rgba(0, 0, 0, 0.12),
+	                  3px 0 3px -2px rgba(0, 0, 0, 0.2);
+			}
+		</style>
+
+		<transport-control-inputs></transport-control-inputs>
+		<transport-control-results></transport-control-results>
 	</template>
+
 	<script>
 		
 	Polymer({

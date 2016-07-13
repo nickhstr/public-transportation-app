@@ -1,5 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="transport-control-panel.html">
 <link rel="import" href="transport-map.html">
 
 <dom-module id="transport-app">
@@ -7,28 +9,32 @@
 		<style>
 			:host {
 				display: flex;
-			}
-
-			.side {
-				width: 400px;
-				height: 100vh;
-				background-color: #4285f4;
-			}
-
-			transport-map {
-				width: calc(100% - 400px);
+				--primary-bg-color: #4285f4;
+				--secondary-bg-color: #3367d6;
+				--primary-input-color: #fff;
+				--secondary-input-color: #b3cefb;
+				--panel-width: 425px;
+				--map-width: calc(100% - var(--panel-width));
 			}
 
 			.alternate {
-				width: calc(100% - 400px);
+				width: var(--map-width);
 			}
 		</style>
+
+		<iron-ajax
+			id="bartRouteAjax"
+			url="[[url]]"
+			handle-as="xml"
+			last-response="{{bartRouteResponse}}"
+			></iron-ajax>
 		
-		<div class="side"></div>
+		<transport-control-panel></transport-control-panel>
+		
 		<transport-map
 			hidden$="[[!online]]"
 			start-address="South San Francisco"
-			end-address="Embarcadero"
+			end-address="Embarcadero Station"
 			latitude="37.779"
 			longitude="-122.3892"></transport-map>
 		<div class="alternate" hidden$="[[online]]">
@@ -44,7 +50,50 @@
 		behaviors: [Polymer.AppNetworkStatusBehavior],
 
 		properties: {
+			cmd: {
+				type: String,
+				value: 'depart',
+				notify: true
+			},
+			orig: {
+				type: String,
+				notify: true
+			},
+			dest: {
+				type: String,
+				notify: true
+			},
+			url: {
+				type: String,
+				notify: true,
+				computed: '_computeUrl(cmd, orig, dest)'
+			}
+		},
 
+		observers: [
+			'_handleRouteResponse(bartRouteResponse)'
+		],
+
+		listeners: {
+			'search': 'fetchTrip',
+			'stations': 'logStat'
+		},
+
+		fetchTrip: function(e) {
+			this.$.bartRouteAjax.generateRequest();
+		},
+
+		logStat: function(e) {
+			this.orig = e.detail.start;
+			this.dest = e.detail.end;
+		},
+
+		_computeUrl: function(cmd, orig, dest) {
+			return 'http://api.bart.gov/api/sched.aspx?cmd=' + cmd + '&orig=' + orig + '&dest=' + dest + '&b=0&a=4&key=MW9S-E7SL-26DU-VV8V';
+		},
+
+		_handleRouteResponse: function(route) {
+			console.log(route);
 		}
 
 	});
