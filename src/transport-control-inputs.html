@@ -55,8 +55,8 @@
 		</div>
 
 		<div class="input-container">
-			<transport-datalist autofocus="true" label="Start" station-abbr="{{startVal}}"></transport-datalist>
-			<transport-datalist label="End" station-abbr="{{endVal}}"></transport-datalist>
+			<transport-datalist autofocus="true" label="Start" station-abbr="{{startVal}}" station-name="{{startName}}"></transport-datalist>
+			<transport-datalist label="End" station-abbr="{{endVal}}" station-name="{{endName}}"></transport-datalist>
 		</div>
 
 		<div class="icons">
@@ -71,14 +71,19 @@
 
 		properties: {},
 
-		observers: ['sendInfo(startVal, endVal)'],
+		observers: ['sendInfo(startVal, startName, endVal, endName)'],
 
 		search: function() {
 			this.fire('search', {detail: 'it worked!'});
 		},
 
-		sendInfo: function(start, end) {
-			this.fire('stations', {start: start, end: end});
+		sendInfo: function(startVal, startName, endVal, endName) {
+			this.fire('stations', {
+				startVal: startVal,
+				endVal: endVal,
+				startName: startName,
+				endName: endName
+			});
 		}
 
 	});
