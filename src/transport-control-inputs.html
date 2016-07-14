@@ -15,6 +15,7 @@
 				align-items: center;
 				padding-bottom: 40px;
 				background-color: var(--primary-bg-color);
+				max-height: var(--panel-inputs-height);
 			}
 
 			.icons {
@@ -43,7 +44,7 @@
 				width: 100%;
 			}
 
-			paper-icon-button.search:hover {
+			paper-icon-button.search:hover, paper-icon-button.search:focus {
 				color: #fff;
 			}
 		</style>
@@ -55,8 +56,17 @@
 		</div>
 
 		<div class="input-container">
-			<transport-datalist autofocus="true" label="Start" station-abbr="{{startVal}}" station-name="{{startName}}"></transport-datalist>
-			<transport-datalist label="End" station-abbr="{{endVal}}" station-name="{{endName}}"></transport-datalist>
+			<transport-datalist
+				autofocus="true"
+				label="Start"
+				station-abbr="{{startVal}}"
+				station-name="{{startName}}"
+				address="{{startAddress}}"></transport-datalist>
+			<transport-datalist
+				label="End"
+				station-abbr="{{endVal}}"
+				station-name="{{endName}}"
+				address="{{endAddress}}"></transport-datalist>
 		</div>
 
 		<div class="icons">
@@ -71,18 +81,20 @@
 
 		properties: {},
 
-		observers: ['sendInfo(startVal, startName, endVal, endName)'],
+		observers: ['_sendInfo(startVal, startName, startAddress, endVal, endName, endAddress)'],
 
 		search: function() {
 			this.fire('search', {detail: 'it worked!'});
 		},
 
-		sendInfo: function(startVal, startName, endVal, endName) {
+		_sendInfo: function(startVal, startName, startAddress, endVal, endName, endAddress) {
 			this.fire('stations', {
 				startVal: startVal,
 				endVal: endVal,
 				startName: startName,
-				endName: endName
+				endName: endName,
+				startAddress: startAddress,
+				endAddress: endAddress
 			});
 		}
 

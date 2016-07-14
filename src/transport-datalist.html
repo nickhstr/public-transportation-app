@@ -20,7 +20,7 @@
 			url="http://api.bart.gov/api/stn.aspx?cmd=stns&key=MW9S-E7SL-26DU-VV8V"
 			handle-as="xml"
 			last-response="{{bartStationsResponse}}"></iron-ajax>
-
+		
 		<paper-input
 			autofocus="[[autofocus]]"
 			list="stations"
@@ -32,6 +32,7 @@
 				<option value="[[item.name]]"></option>
 			</template>
 		</datalist>
+
 	</template>
 	<script>
 		
@@ -51,6 +52,10 @@
 			stationAbbr: {
 				type: String,
 				notify: true
+			},
+			address: {
+				type: String,
+				notify: true
 			}
 		},
 
@@ -59,6 +64,8 @@
 			return keyValStore.get('stations').then(function(data) {
 				if (data) {
 					self.stations = data;
+					self.bool = true;
+					return data;
 				}
 				else {
 					return self.$.bartStations.generateRequest();
@@ -67,7 +74,7 @@
 		},
 
 		observers: [
-			'_computeAbbr(stationName)',
+			'_setAbbrAddress(stationName)',
 			'_handleBartStations(bartStationsResponse)'
 		],
 
@@ -79,19 +86,23 @@
 			stations.forEach(function(station) {
 				list.push({
 					name: station.childNodes[0].textContent,
-					abbr: station.childNodes[1].textContent
+					abbr: station.childNodes[1].textContent,
+					address: station.childNodes[4].textContent + ' ' + station.childNodes[5].textContent + ', CA'
 				});
 			});
 
-			return keyValStore.set('stations', list).then(self.ready);
+			self.stations = list;
+
+			return keyValStore.set('stations', list);
 		},
 
-		_computeAbbr: function(stationName) {
+		_setAbbrAddress: function(stationName) {
 			if (this.stations) {
 				var len = this.stations.length;
 				for (var i = 0; i < len; i++) {
 					if (this.stations[i].name === this.stationName) {
 						this.stationAbbr = this.stations[i].abbr;
+						this.address = this.stations[i].address;
 					}
 				}
 			}

@@ -10,10 +10,12 @@
 			:host {
 				display: flex;
 				--primary-bg-color: #4285f4;
-				--secondary-bg-color: #3367d6;
+				--secondary-bg-color: #fff;
 				--primary-input-color: #fff;
 				--secondary-input-color: #b3cefb;
 				--panel-width: 425px;
+				--panel-inputs-height: 160px;
+				--panel-results-height: calc(100vh - var(--panel-inputs-height));
 				--map-width: calc(100% - var(--panel-width));
 			}
 
@@ -63,6 +65,11 @@
 				type: String,
 				notify: true
 			},
+			time: {
+				type: String,
+				value: '7:00 pm',
+				notify: true
+			},
 			start: {
 				type: String,
 				notify: true
@@ -74,7 +81,7 @@
 			url: {
 				type: String,
 				notify: true,
-				computed: '_computeUrl(cmd, orig, dest)'
+				computed: '_computeUrl(cmd, orig, dest, time)'
 			}
 		},
 
@@ -84,22 +91,22 @@
 
 		listeners: {
 			'search': 'fetchTrip',
-			'stations': 'updateStartEnd'
+			'stations': 'updateRoute'
 		},
 
 		fetchTrip: function(e) {
 			this.$.bartRouteAjax.generateRequest();
 		},
 
-		updateStartEnd: function(e) {
+		updateRoute: function(e) {
 			this.orig = e.detail.startVal;
 			this.dest = e.detail.endVal;
-			this.start = e.detail.startName;
-			this.end = e.detail.endName;
+			this.start = e.detail.startAddress;
+			this.end = e.detail.endAddress;
 		},
 
-		_computeUrl: function(cmd, orig, dest) {
-			return 'http://api.bart.gov/api/sched.aspx?cmd=' + cmd + '&orig=' + orig + '&dest=' + dest + '&b=0&a=4&key=MW9S-E7SL-26DU-VV8V';
+		_computeUrl: function(cmd, orig, dest, time) {
+			return 'http://api.bart.gov/api/sched.aspx?cmd=' + cmd + '&orig=' + orig + '&dest=' + dest + '&time=' + time + '&b=0&a=4&key=MW9S-E7SL-26DU-VV8V';
 		},
 
 		_handleRouteResponse: function(route) {

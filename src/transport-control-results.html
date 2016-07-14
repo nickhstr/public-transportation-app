@@ -1,24 +1,34 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="transport-control-result.html">
 
 <dom-module id="transport-control-results">
 	<template>
-		<style>
+		<style is="custom-style">
 			:host {
 				background-color: var(--secondary-bg-color);
-			}
-
-			div {
-				background-color: var(--secondary-bg-color);
+				height: var(--panel-results-height);
+				display: block;
+				overflow: auto;
 			}
 		</style>
 
-		<div>Hi!</div>
+		<template is="dom-repeat" items="[[results]]">
+			<transport-control-result></transport-control-result>
+		</template>
 	</template>
 	<script>
 		
 	Polymer({
 
-		is: 'transport-control-results'
+		is: 'transport-control-results',
+
+		properties: {
+			results: {
+				type: Array,
+				value: [1, 1, 1, 1],
+				notify: true
+			}
+		}
 
 	});
 
