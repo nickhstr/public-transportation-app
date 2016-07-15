@@ -2,18 +2,19 @@
 <link rel="import" href="../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="transport-datalist.html">
 
 <dom-module id="transport-control-inputs">
 	<template>
 		<style>
 			:host {
-				width: 100%;
+				width: var(--panel-width);
 				display: flex;
 				flex-wrap: wrap;
 				justify-content: center;
-				align-items: center;
-				padding-bottom: 40px;
+				align-items: flex-start;
+				padding-bottom: 20px;
 				background-color: var(--primary-bg-color);
 				max-height: var(--panel-inputs-height);
 			}
@@ -24,7 +25,11 @@
 				flex-wrap: wrap;
 				justify-content: center;
 				align-items: center;
-				padding-top: 20px;
+				padding-top: 30px;
+			}
+
+			.search-icon {
+				padding-top: 25px;
 			}
 
 			.input-container {
@@ -44,12 +49,30 @@
 				width: 100%;
 			}
 
+			paper-input {
+				--primary-text-color: var(--primary-input-color);
+				--primary-color: var(--primary-input-color);
+				--secondary-text-color: var(--secondary-input-color);
+				--disabled-text-color: var(--secondary-input-color);
+			}
+
+			.narrow {
+				width: 115px;
+			}
+
 			paper-icon-button.search:hover, paper-icon-button.search:focus {
 				color: #fff;
 			}
+
+
+			@media (max-width: 410px) {
+				.transit-icons {
+					display: none;
+				}
+			}
 		</style>
 
-		<div class="icons">
+		<div class="icons transit-icons">
 			<iron-icon icon="maps:directions-transit"></iron-icon>
 			<iron-icon class="path" icon="more-vert"></iron-icon>
 			<iron-icon icon="maps:place"></iron-icon>
@@ -57,20 +80,39 @@
 
 		<div class="input-container">
 			<transport-datalist
-				autofocus="true"
-				label="Start"
-				station-abbr="{{startVal}}"
+				autofocus
+				label="[[origLabel]]"
+				station-abbr="{{startAbbr}}"
 				station-name="{{startName}}"
-				address="{{startAddress}}"></transport-datalist>
+				address="{{startAddress}}"
+				invalid-station="{{invalidStart}}">
+			</transport-datalist>
 			<transport-datalist
-				label="End"
-				station-abbr="{{endVal}}"
+				label="[[destLabel]]"
+				station-abbr="{{endAbbr}}"
 				station-name="{{endName}}"
-				address="{{endAddress}}"></transport-datalist>
+				address="{{endAddress}}"
+				invalid-station="{{invalidEnd}}">
+			</transport-datalist>
+			<paper-input
+				class="narrow"
+				label="[[timeLabel]]"
+				type="text"
+				placeholder="Now"
+				onfocus="(this.type='time')"
+				onblur="(this.type='text')"
+				value="{{time}}">
+			</paper-input>
 		</div>
 
-		<div class="icons">
-			<paper-icon-button class="search" icon="search" tab-index="0" on-tap="search"></paper-icon-button>
+		<div class="icons search-icon">
+			<paper-icon-button
+				class="search"
+				icon="search"
+				tab-index="0"
+				on-tap="search"
+				disabled$="[[!canSearch]]">
+			</paper-icon-button>
 		</div>
 	</template>
 	<script>
@@ -79,23 +121,45 @@
 
 		is: 'transport-control-inputs',
 
-		properties: {},
+		properties: {
+			canSearch: {
+				type: Boolean,
+				notify: true
+			}
+		},
 
-		observers: ['_sendInfo(startVal, startName, startAddress, endVal, endName, endAddress)'],
+		ready: function() {
+			this.canSearch = false;
+		},
+
+		observers: [
+			'_sendInfo(startAbbr, startName, startAddress, endAbbr, endName, endAddress, time)',
+			'_validateSearch(invalidStart, invalidEnd)'
+		],
 
 		search: function() {
 			this.fire('search', {detail: 'it worked!'});
 		},
 
-		_sendInfo: function(startVal, startName, startAddress, endVal, endName, endAddress) {
+		_sendInfo: function(startAbbr, startName, startAddress, endAbbr, endName, endAddress, time) {
 			this.fire('stations', {
-				startVal: startVal,
-				endVal: endVal,
+				startAbbr: startAbbr,
+				endAbbr: endAbbr,
 				startName: startName,
 				endName: endName,
 				startAddress: startAddress,
-				endAddress: endAddress
+				endAddress: endAddress,
+				time: time
 			});
+		},
+
+		_validateSearch: function(invalidStart, invalidEnd) {
+			if (!invalidStart && !invalidEnd) {
+				this.canSearch = true;
+			}
+			else if (invalidStart || invalidEnd) {
+				this.canSearch = false;
+			}
 		}
 
 	});
