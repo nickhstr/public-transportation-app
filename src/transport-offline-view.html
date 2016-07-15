@@ -1,0 +1,50 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+
+<dom-module id="transport-offline-view">
+	<template>
+		<style>
+			:host {
+				width: var(--map-width);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				background-color: var(--tertiary-bg-color);
+			}
+
+			.message-container {
+				margin: 0;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.message {
+				margin: 0;
+				width: 100%;
+			}
+
+			paper-spinner {
+				margin: 20px 0;
+			}
+		</style>
+
+		<div class="message-container">
+			<p class="message">You're offline. Attempting to reconnect.</p>
+			<paper-spinner active="[[!online]]" alt="Attempting to reconnect"></paper-spinner>
+		</div>
+	</template>
+	<script>
+		
+	Polymer({
+
+		is: 'transport-offline-view',
+
+		behaviors: [Polymer.AppNetworkStatusBehavior]
+
+	});
+
+	</script>
+</dom-module>
