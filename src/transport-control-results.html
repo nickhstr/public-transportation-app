@@ -12,8 +12,14 @@
 			}
 		</style>
 
-		<template is="dom-repeat" items="[[results]]">
-			<transport-control-result></transport-control-result>
+		<template is="dom-repeat" items="[[tripData]]">
+			<transport-control-result
+				start="[[item.start]]"
+				end="[[item.end]]"
+				depart="[[item.depart]]"
+				fare="[[item.fare]]"
+				arrive="[[item.arrive]]">
+			</transport-control-result>
 		</template>
 	</template>
 	<script>
@@ -23,9 +29,8 @@
 		is: 'transport-control-results',
 
 		properties: {
-			results: {
+			tripData: {
 				type: Array,
-				value: [1, 1, 1, 1],
 				notify: true
 			}
 		}

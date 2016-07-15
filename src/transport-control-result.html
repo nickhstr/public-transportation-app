@@ -1,16 +1,108 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/paper-progress/paper-progress.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
 
 <dom-module id="transport-control-result">
 	<template>
-		<style></style>
+		<style>
+			:host {
+				width: 100%;
+				display: none;
+			}
 
-		<div>hi</div>
+			paper-material {
+				margin: 10px;
+				display: flex;
+				flex-wrap: wrap;
+				padding: 5px;
+			}
+
+			.row {
+				width: 100%;
+				display: flex;
+				flex-wrap: wrap;
+				justify-content: space-around;
+				align-items: center;
+				margin: 15px;
+			}
+
+			p {
+				display: inline-block;
+				margin: 0;
+			}
+
+			.middle {
+				width: 200px;
+				text-align: center;
+				color: var(--secondary-txt-color);
+			}
+
+			.light {
+				font-weight: 300;
+			}
+
+			paper-progress {
+				height: 4px;
+				--paper-progress-active-color: var(--progress-color);
+				--paper-progress-transition-duration: 0.5s;
+			  --paper-progress-transition-timing-function: ease;
+			  --paper-progress-transition-transition-delay: 0s;
+			}
+		</style>
+
+		<paper-material elevation="1">
+			<div class="row">
+				<p>[[start]]</p>
+				<paper-progress class="transiting" value="[[progressVal]]"></paper-progress>
+				<p>[[end]]</p>
+			</div>
+			<div class="row">
+				<p class="light">[[depart]]</p>
+				<p class="middle light">Fare: $[[fare]]</p>
+				<p class="light">[[arrive]]</p>
+			</div>
+		</paper-material>
 	</template>
 	<script>
 		
 	Polymer({
 
-		is: 'transport-control-result'
+		is: 'transport-control-result',
+
+		behaviors: [
+			Polymer.NeonAnimationRunnerBehavior
+		],
+
+		properties: {
+			animationConfig: {
+				value: function() {
+					return {
+						'entry': {
+							name: 'fade-in-animation',
+							node: this
+						}
+					}
+				}
+			},
+			progressVal: {
+				value: 0,
+				notify: true
+			}
+		},
+
+		attached: function() {
+			var self = this;
+
+			this.playAnimation('entry');
+			this.style.display = 'block';
+
+			setTimeout(function() {
+				self.progressVal = 100;
+			}, 500);
+		}
 
 	});
 
