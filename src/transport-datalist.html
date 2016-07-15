@@ -22,7 +22,10 @@
 			last-response="{{bartStationsResponse}}"></iron-ajax>
 		
 		<paper-input
-			autofocus="[[autofocus]]"
+			autofocus$="[[autofocus]]"
+			required
+			invalid="{{invalidStation}}"
+			error-message="Please select a valid station"
 			list="stations"
 			label="[[label]]"
 			value="{{stationName}}">
@@ -56,6 +59,10 @@
 			address: {
 				type: String,
 				notify: true
+			},
+			invalidStation: {
+				type: Boolean,
+				notify: true
 			}
 		},
 
@@ -75,6 +82,7 @@
 
 		observers: [
 			'_setAbbrAddress(stationName)',
+			'_validateStation(stationName)',
 			'_handleBartStations(bartStationsResponse)'
 		],
 
@@ -105,6 +113,19 @@
 						this.address = this.stations[i].address;
 					}
 				}
+			}
+		},
+
+		_validateStation: function(val) {
+			console.log('validator called');
+			if (this.stations) {
+				var len = this.stations.length;
+				for (var i = 0; i < len; i++) {
+					if (val === this.stations[i].name) {
+						return this.invalidStation = false;
+					}
+				}
+				return this.invalidStation = true;
 			}
 		}
 
