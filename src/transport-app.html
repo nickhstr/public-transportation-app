@@ -1,26 +1,47 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/font-roboto/roboto.html">
 <link rel="import" href="transport-control-panel.html">
 <link rel="import" href="transport-map.html">
+<link rel="import" href="transport-offline-view.html">
 
 <dom-module id="transport-app">
 	<template>
 		<style>
 			:host {
 				display: flex;
+				--primary-txt-color: #000;
+				--secondary-txt-color: #888;
 				--primary-bg-color: #4285f4;
 				--secondary-bg-color: #fff;
+				--tertiary-bg-color: #e6e6e6;
 				--primary-input-color: #fff;
 				--secondary-input-color: #b3cefb;
+				--paper-input-container-invalid-color: #fff;
 				--panel-width: 425px;
-				--panel-inputs-height: 160px;
+				--panel-inputs-height: 202px;
 				--panel-results-height: calc(100vh - var(--panel-inputs-height));
+				--progress-color: #3367d6;
 				--map-width: calc(100% - var(--panel-width));
+				font-family: 'Roboto', Helvetica, sans-serif;
 			}
 
-			.alternate {
-				width: var(--map-width);
+
+			@media (max-width: 770px) {
+				:host {
+					--panel-width: 100%;
+				}
+
+				transport-map {
+					display: none;
+				}
+			}
+
+			@media (max-width: 410px) {
+				:host {
+					--panel-inputs-height: 232px;
+				}
 			}
 		</style>
 
@@ -28,20 +49,22 @@
 			id="bartRouteAjax"
 			url="[[url]]"
 			handle-as="xml"
-			last-response="{{bartRouteResponse}}"
-			></iron-ajax>
+			last-response="{{bartRouteResponse}}">
+		</iron-ajax>
 		
-		<transport-control-panel></transport-control-panel>
+		<transport-control-panel
+			trip-data="{{tripData}}">
+		</transport-control-panel>
 		
 		<transport-map
+			id="tripMap"
 			hidden$="[[!online]]"
-			start-address="{{start}}"
-			end-address="{{end}}"
 			latitude="37.779"
-			longitude="-122.3892"></transport-map>
-		<div class="alternate" hidden$="[[online]]">
-			<p>Some awesome stuff</p>
-		</div>
+			longitude="-122.3892">
+		</transport-map>
+		
+		<transport-offline-view
+			hidden$="[[online]]"></transport-offline-view>
 	</template>
 	<script>
 		
@@ -67,7 +90,6 @@
 			},
 			time: {
 				type: String,
-				value: '7:00 pm',
 				notify: true
 			},
 			start: {
@@ -82,11 +104,25 @@
 				type: String,
 				notify: true,
 				computed: '_computeUrl(cmd, orig, dest, time)'
+			},
+			key: {
+				type: String,
+				notify: true
+			},
+			tripData: {
+				type: Array,
+				notify: true
+			},
+			wentOffline: {
+				type: Boolean,
+				value: false,
+				notify: true
 			}
 		},
 
 		observers: [
-			'_handleRouteResponse(bartRouteResponse)'
+			'_handleRouteResponse(bartRouteResponse)',
+			'_reloadMap(online)'
 		],
 
 		listeners: {
@@ -95,14 +131,27 @@
 		},
 
 		fetchTrip: function(e) {
-			this.$.bartRouteAjax.generateRequest();
+			var self = this;
+			this.key = [this.cmd, this.orig, this.dest, this.time].join('-');
+
+			if (this.online) {
+				this.$.tripMap.startAddress = this.start;
+				this.$.tripMap.endAddress = this.end;
+				return this.$.bartRouteAjax.generateRequest();
+			}
+			else {
+				keyValStore.get(this.key).then(function(val) {
+					self.tripData = val;
+				});
+			}
 		},
 
 		updateRoute: function(e) {
-			this.orig = e.detail.startVal;
-			this.dest = e.detail.endVal;
+			this.orig = e.detail.startAbbr;
+			this.dest = e.detail.endAbbr;
 			this.start = e.detail.startAddress;
 			this.end = e.detail.endAddress;
+			this.time = this.formatTime(e.detail.time);
 		},
 
 		_computeUrl: function(cmd, orig, dest, time) {
@@ -111,6 +160,52 @@
 
 		_handleRouteResponse: function(route) {
 			console.log(route);
+			var trips = route.firstChild.childNodes[4].childNodes[4].childNodes;
+			var length = trips.length;
+			var result = [];
+
+			for (var i = 0; i < length; i++) {
+				result.push({
+					start: trips[i].getAttribute('origin'),
+					end: trips[i].getAttribute('destination'),
+					depart: trips[i].getAttribute('origTimeMin'),
+					arrive: trips[i].getAttribute('destTimeMin'),
+					fare: trips[i].getAttribute('fare')
+				});
+			}
+
+			this.tripData = result;
+			return keyValStore.set(this.key, result);
+		},
+
+		_reloadMap: function(online) {
+			if (online && this.wentOffline) {
+				this.$.tripMap.resize();
+			}
+			else if (!online) {
+				this.wentOffline = true;
+			}
+		},
+
+		formatTime: function(time) {
+			if (!time) {
+				return 'now';
+			}
+
+			var split = time.split(':');
+			var hour = parseInt(split[0], 10);
+			var formattedHour;
+			var formattedTime = '';
+
+			if (hour > 12) {
+				formattedHour = hour - 12;
+				formattedTime += formattedHour + ':' + split[1] + 'pm';
+				return formattedTime;
+			}
+			else {
+				formattedTime += split[0] + ':' + split[1] + 'am';
+				return formattedTime;
+			}
 		}
 
 	});
