@@ -20,6 +20,7 @@
 			end-address="[[endAddress]]"
 			travel-mode="TRANSIT"></google-map-directions>
 		<google-map
+			id="gmap"
 			map="{{map}}"
 			latitude="[[latitude]]"
 			longitude="[[longitude]]"
@@ -30,7 +31,11 @@
 		
 	Polymer({
 
-		is: 'transport-map'
+		is: 'transport-map',
+
+		resize: function() {
+			this.$.gmap.resize();
+		}
 
 	});
 
