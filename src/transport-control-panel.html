@@ -7,23 +7,43 @@
 		<style is="custom-style">
 			:host {
 				z-index: 1;
-				width: var(--panel-width);
+				max-width: var(--panel-width);
 				height: 100vh;
 				box-shadow: 3px 0 4px 2px rgba(0, 0, 0, 0.14),
 	                  1px 0 8px 2px rgba(0, 0, 0, 0.12),
 	                  3px 0 3px -2px rgba(0, 0, 0, 0.2);
 			}
+
+
+			@media (max-width: 770px) {
+				:host {
+					width: var(--panel-width);
+				}
+			}
 		</style>
 
-		<transport-control-inputs></transport-control-inputs>
-		<transport-control-results></transport-control-results>
+		<transport-control-inputs
+			orig-label="Start"
+			dest-label="End"
+			time-label="When?">
+		</transport-control-inputs>
+		<transport-control-results
+			trip-data="{{tripData}}">
+		</transport-control-results>
 	</template>
 
 	<script>
 		
 	Polymer({
 
-		is: 'transport-control-panel'
+		is: 'transport-control-panel',
+
+		properties: {
+			tripData: {
+				type: Array,
+				notify: true
+			}
+		}
 
 	});
 
