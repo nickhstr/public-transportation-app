@@ -1,11 +1,10 @@
 <!doctype html>
-
 <html>
-
 	<head>
-	  <title>Offline-First BART Trip Planner</title>
-	  <meta charset="utf-8">
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+	  <title>Offline Transport App</title>
+	  <link rel="manifest" href="manifest.json">
 	  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 	  <script src="src/idb-promised.js"></script>
 	  <link rel="import" href="src/transport-app.html">
@@ -40,19 +39,16 @@
 	  <style>
 	    body {
 	      background-color: #fff;
-	      font-family: Helvetica, Arial, sans-serif;
 	      margin: 0;
 	    }
 	  </style>
 	</head>
-
 	<body unresolved>
 		<transport-app></transport-app>
 		<script>
-			// if ('serviceWorker' in navigator) {
-			//   navigator.serviceWorker.register('/service-worker.js');
-			// }
+			if ('serviceWorker' in navigator) {
+			  navigator.serviceWorker.register('/service-worker.js');
+			}
 		</script>
 	</body>
-
 </html>
