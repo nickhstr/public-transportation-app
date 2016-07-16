@@ -1,0 +1,39 @@
+<!--
+
+BART ROUTE MESSAGE
+
+Message for special schedule information.
+
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="transport-message">
+	<template>
+		<style>
+			:host {
+				font-weight: 300;
+			}
+		</style>
+	</template>
+	<script>
+		
+	Polymer({
+
+		is: 'transport-message',
+
+		properties: {
+			message: {
+				type: String,
+				observer: '_messageChanged'
+			}
+		},
+
+		// Chnage this element's HTML on this.message change
+		_messageChanged: function(message) {
+			this.innerHTML = message;
+		}
+
+	});
+
+	</script>
+</dom-module>

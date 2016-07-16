@@ -1,0 +1,87 @@
+<!--
+
+BART ROUTE SPECIAL SCHEDULE
+
+Displays special schedule information for trip.
+
+-->
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation-runner-behavior.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../bower_components/neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="transport-message.html">
+
+<dom-module id="transport-special-schedule">
+	<template>
+		<style>
+			:host {
+				width: 100%;
+				display: none;
+			}
+
+			paper-material {
+				margin: 10px;
+				padding: 5px;
+			}
+
+			p {
+				margin: 15px;
+			}
+		</style>
+
+		<paper-material elevation="0">
+			<p class="title">[[title]]</p>
+			<p class="message"><transport-message message="[[tripMessage]]"></transport-message></p>
+		</paper-material>
+	</template>
+	<script>
+		
+	Polymer({
+
+		is: 'transport-special-schedule',
+
+		behaviors: [
+			Polymer.NeonAnimationRunnerBehavior
+		],
+
+		properties: {
+			animationConfig: {
+				value: function() {
+					return {
+						'entry': {
+							name: 'fade-in-animation',
+							node: this
+						},
+						'exit': {
+							name: 'fade-out-animation',
+							node: this
+						}
+					}
+				}
+			},
+			title: {
+				type: String,
+				notify: true
+			},
+			tripMessage: {
+				notify: true,
+				observer: '_animateThis'
+			}
+		},
+
+		_animateThis: function(message) {
+			if (message) {
+				this.playAnimation('entry');
+				this.style.display = 'block';
+			}
+			else {
+				this.playAnimation('exit');
+				this.style.display = 'none';
+			}
+		}
+
+	});
+
+	</script>
+</dom-module>
