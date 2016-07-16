@@ -22,12 +22,14 @@ A google map with transit directions based on the requested BART route.
 		</style>
 	
 		<google-map-directions
+			api-key="[[apiKey]]"
 			map="{{map}}"
 			start-address="[[startAddress]]"
 			end-address="[[endAddress]]"
 			travel-mode="TRANSIT"></google-map-directions>
 		<google-map
 			id="gmap"
+			api-key="[[apiKey]]"
 			map="{{map}}"
 			latitude="[[latitude]]"
 			longitude="[[longitude]]"
