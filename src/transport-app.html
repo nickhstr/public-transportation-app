@@ -1,7 +1,15 @@
+<!--
+
+APP SHELL
+
+This is foundation of the app.
+
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-storage/app-network-status-behavior.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../bower_components/font-roboto/roboto.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="transport-control-panel.html">
 <link rel="import" href="transport-map.html">
 <link rel="import" href="transport-offline-view.html">
@@ -23,6 +31,7 @@
 				--panel-inputs-height: 202px;
 				--panel-results-height: calc(100vh - var(--panel-inputs-height));
 				--progress-color: #3367d6;
+				--icon-color: #f52757;
 				--map-width: calc(100% - var(--panel-width));
 				font-family: 'Roboto', Helvetica, sans-serif;
 			}
@@ -33,7 +42,7 @@
 					--panel-width: 100%;
 				}
 
-				transport-map {
+				transport-map, transport-offline-view {
 					display: none;
 				}
 			}
@@ -64,7 +73,11 @@
 		</transport-map>
 		
 		<transport-offline-view
-			hidden$="[[online]]"></transport-offline-view>
+			hidden$="[[online]]"
+			message="You're offline. Attempting to reconnect.">
+		</transport-offline-view>
+
+		<paper-toast id="onlineToast" text="[[toastText]]"></paper-toast>
 	</template>
 	<script>
 		
@@ -130,8 +143,10 @@
 			'stations': 'updateRoute'
 		},
 
+		// This gets the requested route's data, either with an ajax request if online, or from the user's indexeddb - if the user has already requested the same route when online
 		fetchTrip: function(e) {
 			var self = this;
+			// Sets the key to use when searching in indexeddb
 			this.key = [this.cmd, this.orig, this.dest, this.time].join('-');
 
 			if (this.online) {
@@ -141,25 +156,36 @@
 			}
 			else {
 				keyValStore.get(this.key).then(function(val) {
-					self.tripData = val;
+					if (val) {
+						self.tripData = val;
+					}
+					else {
+						self.tripData = [{
+							start: self.orig,
+							end: self.dest,
+							fare: 'Not online and trip not saved.'
+						}]
+					}
 				});
 			}
 		},
 
+		// Event handler for values the user has set in the control panel
 		updateRoute: function(e) {
 			this.orig = e.detail.startAbbr;
 			this.dest = e.detail.endAbbr;
-			this.start = e.detail.startAddress;
-			this.end = e.detail.endAddress;
+			this.start = e.detail.startName;
+			this.end = e.detail.endName;
 			this.time = this.formatTime(e.detail.time);
 		},
 
+		// Set the ajax url based on the values given by the user
 		_computeUrl: function(cmd, orig, dest, time) {
 			return 'http://api.bart.gov/api/sched.aspx?cmd=' + cmd + '&orig=' + orig + '&dest=' + dest + '&time=' + time + '&b=0&a=4&key=MW9S-E7SL-26DU-VV8V';
 		},
 
+		// Ajax response handler. For each route, its info is set in an object and pushed to an array. That array is then set as the value for its appropriate key, defined when the route was requested.
 		_handleRouteResponse: function(route) {
-			console.log(route);
 			var trips = route.firstChild.childNodes[4].childNodes[4].childNodes;
 			var length = trips.length;
 			var result = [];
@@ -170,7 +196,7 @@
 					end: trips[i].getAttribute('destination'),
 					depart: trips[i].getAttribute('origTimeMin'),
 					arrive: trips[i].getAttribute('destTimeMin'),
-					fare: trips[i].getAttribute('fare')
+					fare: 'Fare: $' + trips[i].getAttribute('fare')
 				});
 			}
 
@@ -178,15 +204,23 @@
 			return keyValStore.set(this.key, result);
 		},
 
+		// This reloads the google map when the user is back online, and opens the toast notification
 		_reloadMap: function(online) {
 			if (online && this.wentOffline) {
 				this.$.tripMap.resize();
+				this.$.onlineToast.show({
+					text: 'You\'re back online!'
+				});
 			}
 			else if (!online) {
 				this.wentOffline = true;
+				this.$.onlineToast.show({
+					text: 'You\'re not online! Trying to reconnect...'
+				});
 			}
 		},
 
+		// Formats the requested route departure time from 24-hour to 12-hour, for use with the BART API
 		formatTime: function(time) {
 			if (!time) {
 				return 'now';
