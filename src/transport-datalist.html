@@ -1,3 +1,10 @@
+<!--
+
+START/END INPUT
+
+An input for either the start or end BART station.
+
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
@@ -66,6 +73,7 @@
 			}
 		},
 
+		// Because BART station info is unlikely to change after the ajax requst made on the first load, station information is fetched from indexeddb, thereby increasing performance and reducing data usage.
 		ready: function() {
 			var self = this;
 			return keyValStore.get('stations').then(function(data) {
@@ -86,6 +94,7 @@
 			'_handleBartStations(bartStationsResponse)'
 		],
 
+		// When the user loads the app for the first time, a request for all the stations' info is made. When its response is received, the data is parsed for each station's name, abbreviation, and address. Each station's parsed data is stored in object, pushed to an array, and then saved to indexeddb for future use.
 		_handleBartStations: function(response) {
 			var self = this;
 			var list = [];
@@ -104,6 +113,7 @@
 			return keyValStore.set('stations', list);
 		},
 
+		// Sets the appropriate station abbreviation and address for use in transport-app
 		_setAbbrAddress: function(stationName) {
 			if (this.stations) {
 				var len = this.stations.length;
@@ -116,8 +126,8 @@
 			}
 		},
 
+		// Checks for a valid station name. If input's value does not match any BART station names, the value is invalid.
 		_validateStation: function(val) {
-			console.log('validator called');
 			if (this.stations) {
 				var len = this.stations.length;
 				for (var i = 0; i < len; i++) {

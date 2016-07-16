@@ -1,3 +1,10 @@
+<!--
+
+BART ROUTE RESULT
+
+An individual element containing a route's information.
+
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../bower_components/paper-progress/paper-progress.html">
@@ -35,7 +42,7 @@
 			}
 
 			.middle {
-				width: 200px;
+				max-width: 200px;
 				text-align: center;
 				color: var(--secondary-txt-color);
 			}
@@ -61,7 +68,7 @@
 			</div>
 			<div class="row">
 				<p class="light">[[depart]]</p>
-				<p class="middle light">Fare: $[[fare]]</p>
+				<p class="middle light">[[fare]]</p>
 				<p class="light">[[arrive]]</p>
 			</div>
 		</paper-material>

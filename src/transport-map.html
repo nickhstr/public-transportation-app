@@ -1,3 +1,10 @@
+<!--
+
+BART ROUTE MAP
+
+A google map with transit directions based on the requested BART route.
+
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/google-map/google-map.html">
 <link rel="import" href="../bower_components/google-map/google-map-directions.html">
@@ -33,6 +40,7 @@
 
 		is: 'transport-map',
 
+		// Resize function, useful for triggering the map to reload after being unhidden
 		resize: function() {
 			this.$.gmap.resize();
 		}
