@@ -62,7 +62,8 @@ This is foundation of the app.
 		</iron-ajax>
 		
 		<transport-control-panel
-			trip-data="{{tripData}}">
+			trip-data="{{tripData}}"
+			trip-message="{{tripMessage}}">
 		</transport-control-panel>
 		
 		<transport-map
@@ -126,6 +127,10 @@ This is foundation of the app.
 				type: Array,
 				notify: true
 			},
+			tripMessage: {
+				type: String,
+				notify: true
+			},
 			wentOffline: {
 				type: Boolean,
 				value: false,
@@ -167,6 +172,7 @@ This is foundation of the app.
 						}]
 					}
 				});
+				this.tripMessage = null;
 			}
 		},
 
@@ -186,7 +192,10 @@ This is foundation of the app.
 
 		// Ajax response handler. For each route, its info is set in an object and pushed to an array. That array is then set as the value for its appropriate key, defined when the route was requested.
 		_handleRouteResponse: function(route) {
+			// The trips information
 			var trips = route.firstChild.childNodes[4].childNodes[4].childNodes;
+			// Any special schedule message for the trip
+			var message = route.firstChild.childNodes[5].firstChild.childNodes[0].data;
 			var length = trips.length;
 			var result = [];
 
@@ -201,6 +210,7 @@ This is foundation of the app.
 			}
 
 			this.tripData = result;
+			this.tripMessage = message;
 			return keyValStore.set(this.key, result);
 		},
 

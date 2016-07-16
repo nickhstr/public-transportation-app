@@ -6,6 +6,7 @@ Holds all the BART route results.
 
 -->
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="transport-special-schedule.html">
 <link rel="import" href="transport-control-result.html">
 
 <dom-module id="transport-control-results">
@@ -28,6 +29,8 @@ Holds all the BART route results.
 				arrive="[[item.arrive]]">
 			</transport-control-result>
 		</template>
+
+		<transport-special-schedule title="Special Schedule Info" trip-message="[[tripMessage]]"></transport-special-schedule>
 	</template>
 	<script>
 		
@@ -38,6 +41,10 @@ Holds all the BART route results.
 		properties: {
 			tripData: {
 				type: Array,
+				notify: true
+			},
+			tripMessage: {
+				value: '',
 				notify: true
 			}
 		}

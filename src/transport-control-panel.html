@@ -35,7 +35,8 @@ The container for the inputs and route results.
 			time-label="When?">
 		</transport-control-inputs>
 		<transport-control-results
-			trip-data="{{tripData}}">
+			trip-data="{{tripData}}"
+			trip-message="{{tripMessage}}">
 		</transport-control-results>
 	</template>
 
@@ -48,6 +49,9 @@ The container for the inputs and route results.
 		properties: {
 			tripData: {
 				type: Array,
+				notify: true
+			},
+			tripMessage: {
 				notify: true
 			}
 		}
