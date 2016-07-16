@@ -172,14 +172,17 @@ This holds all the inputs for requesting a BART route.
 					this.canSearch = false;
 					this.invalidEnd = true;
 				}
+				// Can't search for routes if the inputs are invalid
+				else if (invalidStart || invalidEnd) {
+					this.canSearch = false;
+				}
+				// If both are valid, you're good to go!
+				else if (!invalidStart && !invalidEnd) {
+					this.canSearch = true;
+				}
 			}
-			// Can't search for routes if the inputs are invalid
-			else if (invalidStart || invalidEnd) {
+			else {
 				this.canSearch = false;
-			}
-			// If both are valid, you're good to go!
-			else if (!invalidStart && !invalidEnd) {
-				this.canSearch = true;
 			}
 		}
 
