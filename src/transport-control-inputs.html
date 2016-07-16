@@ -1,3 +1,10 @@
+<!--
+
+CONTROL INPUTS
+
+This holds all the inputs for requesting a BART route.
+
+-->
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/iron-icons/maps-icons.html">
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
@@ -88,6 +95,7 @@
 				invalid-station="{{invalidStart}}">
 			</transport-datalist>
 			<transport-datalist
+				id="endStation"
 				label="[[destLabel]]"
 				station-abbr="{{endAbbr}}"
 				station-name="{{endName}}"
@@ -128,19 +136,22 @@
 			}
 		},
 
+		// Default the search button to disabled
 		ready: function() {
 			this.canSearch = false;
 		},
 
 		observers: [
 			'_sendInfo(startAbbr, startName, startAddress, endAbbr, endName, endAddress, time)',
-			'_validateSearch(invalidStart, invalidEnd)'
+			'_validateSearch(invalidStart, invalidEnd, startName, endName)'
 		],
 
+		// "search" event fired for transport-app to handle
 		search: function() {
-			this.fire('search', {detail: 'it worked!'});
+			this.fire('search', null);
 		},
 
+		// "stations" event fired when input values change, for transport-app to handle
 		_sendInfo: function(startAbbr, startName, startAddress, endAbbr, endName, endAddress, time) {
 			this.fire('stations', {
 				startAbbr: startAbbr,
@@ -153,12 +164,22 @@
 			});
 		},
 
-		_validateSearch: function(invalidStart, invalidEnd) {
-			if (!invalidStart && !invalidEnd) {
-				this.canSearch = true;
+		// Check if the inputs are valid for a search
+		_validateSearch: function(invalidStart, invalidEnd, startName, endName) {
+			// Start and end stations cannot be the same
+			if (startName !== '' || endName !== '') {
+				if (startName === endName) {
+					this.canSearch = false;
+					this.invalidEnd = true;
+				}
 			}
+			// Can't search for routes if the inputs are invalid
 			else if (invalidStart || invalidEnd) {
 				this.canSearch = false;
+			}
+			// If both are valid, you're good to go!
+			else if (!invalidStart && !invalidEnd) {
+				this.canSearch = true;
 			}
 		}
 
