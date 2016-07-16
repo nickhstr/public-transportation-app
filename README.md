@@ -25,7 +25,7 @@ Because this app is built with Polymer, its build process is handled by the Poly
 - Assuming bower is installed, run `bower install`
 - Run `polymer-build`
 
-The repository already includes the build files, but this process will overwrite the old with the new. Within the build folder, you'll find two folders, "bundled" and "unbundled". The first consolidates all app assets into one file (in this case "transport-app.html") to reduce the number of requests made to the server; the latter is better suited for HTTP2 servers. For this app, either will work just fine; the performance difference is not significant.
+Within the build folder, you'll find two folders, "bundled" and "unbundled". The first consolidates all app assets into one file (in this case "transport-app.html") to reduce the number of requests made to the server; the latter is better suited for HTTP2 servers. For this app, either will work just fine; the performance difference is not significant.
 
 ### Important Notes
 
