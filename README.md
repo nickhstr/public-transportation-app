@@ -30,5 +30,3 @@ Within the build folder, you'll find two folders, "bundled" and "unbundled". The
 ### Important Notes
 
 Please use Google Chrome for this app. It is the only browser guaranteed to fully work with this app.
-
-Also, because BART's API uses HTTP rather than HTTPS, a [proxy server](https://crossorigin.me) was used to mitigate CORS errors. The proxy server basically serves as a bridge of communication between my app and BARTS's API.
